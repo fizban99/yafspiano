@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=yafspiano
+Comment=yafspiano
+Exec=bash -c '/usr/bin/python3 ~/yafspiano/yafspiano.py'
+StartupNotify=true
+Terminal=true
+Hidden=false
+NoDisplay=false
