@@ -3,10 +3,10 @@ Yafspiano
 
 _Yet Another FluidSynth Piano. Python3 script to use a TV Box as a headless software midi synthesizer for a USB Midi keyboard_
 
-There are many people that have created scripts to use a Raspberry Pi as a software synth to use it as a standalone device into which connect a midi keyboard. Among others, the [SquishBox](https://geekfunklabs.com/products/squishbox/), [Zynthian](https://zynthian.org/), the [Sampler box](https://www.samplerbox.org/), the [Zbox](https://zircothc.wordpress.com/2017/12/11/zbox-orange-pi-zero-and-fluidsynth-headless/) or [Pipiano](https://github.com/bneijt/pipiano) / [original Pipiano](http://jacquespi.blogspot.com/2013/07/synthesizer.html). Most of them are based on [FluidSynth](https://www.fluidsynth.org/). This is just one more, but with the twist of using the hardware buttons of the USB soundcard for additional control, which is easier than using the edit button of the midi keyboard (if it has one). Besides, it has been actually tested only on a TV Box runing Armbian. This is much less ambitius than the [Sonaremin project](https://github.com/hexdump0815/sonaremin), which is also targeted towards TV Boxes.
+There are many people that have created scripts to use a Raspberry Pi as a software synth to use it as a standalone device into which connect a midi keyboard. Among others, the [SquishBox](https://geekfunklabs.com/products/squishbox/), [Zynthian](https://zynthian.org/), the [Sampler box](https://www.samplerbox.org/), the [Zbox](https://zircothc.wordpress.com/2017/12/11/zbox-orange-pi-zero-and-fluidsynth-headless/) or [Pipiano](https://github.com/bneijt/pipiano) / [original Pipiano](http://jacquespi.blogspot.com/2013/07/synthesizer.html). Most of them are based on [FluidSynth](https://www.fluidsynth.org/). This is just one more of those projects, but with the twist of using the hardware buttons of the USB soundcard for additional control, which is easier than using the edit button of the midi keyboard (if it has one). Besides, it has been actually tested only on a TV Box runing Armbian. This is much less ambitius than the [Sonaremin project](https://github.com/hexdump0815/sonaremin), which is also targeted towards TV Boxes.
 
 
-Althugh this script has been tested on a QPlus TV Box, it might work with other devices with Armbian (similar ones are the T95 and T95Max, if H6-based).
+Although this script has been tested on a QPlus TV Box, it might work with other devices with Armbian (similar ones are the T95 and T95Max, if H6-based).
 The QPlus TV Box is based on the Allwinner H6 chipset, which is the same chipset of several Orange Pi models, but at a competitive price since it comes with 2GB-4GB (although only 3GB available) RAM, 32GB/64GB emmc memory, a case, and a power plug. Check Amazon or AliExpress for current prices. Unfortunately, this low price comes with some limitations: the unofficial Armbian version that can be installed on these devices often do not support their WiFi, their GPU, their remote or their internal audio DAC, which might be OK for certain projects such as this one. Once configured, the box takes less than 40 seconds to be ready to play from the moment you plug it in.
 
 The python script might actually work on any linux box, but it has not been tested.
@@ -131,7 +131,7 @@ Check that fluidsynth launches:
 ```
 fluidsynth
 ```
-You should get a `>` prompt. Press CTRL+C to exit fluidsynth.
+Although fluidsynth will complain about not finding a soundfont, you should get a `>` prompt. Press CTRL+C to exit fluidsynth.
 
 We will also install a component to reduce the latency of the sound. With jack, the latency can be much lower than any latency you can have in Android. The drawback is that only one application can take a hold of the audio device, which for us is fine (just remember not to have Firefox on when running the headless_synth):
 ```
@@ -197,6 +197,7 @@ You can download the GM Soundfont that typically is used with fluidsynth and cre
 ```
 sudo apt install -y fluid-soundfont-gm
 ln -s /usr/share/sounds/sf2/FluidR3_GM.sf2 ~/yafspiano/soundfonts/
+```
 
 Usage
 ------------
