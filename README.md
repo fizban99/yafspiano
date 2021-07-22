@@ -11,7 +11,7 @@ The QPlus TV Box is based on the Allwinner H6 chipset, which is the same chipset
 
 The python script might actually work on any linux box, but it has not been tested.
 
-Besides the TV Box, you also need a USB soundcard (preferably with 4 buttons: mute mic, mute volume, volume up and volume down). The buttons allow changing the instrument and the bank. You can use a USB Soundcard without buttons, but you will just be able to play one instrument. Obviously, you should also have a USB Midi keyboard or to connect to the box. The idea of the project is to be headless (without monitor), so you just switch on the box, wait a few seconds to boot, and start playing without the need of a keyboard, mouse or monitor. 
+Besides the TV Box, you also need a USB soundcard (preferably with 4 buttons: mute mic, mute volume, volume up and volume down). The buttons allow changing the instrument and the bank. You can use a USB Soundcard without buttons, but you will just be able to play one instrument. Obviously, you should also have a USB Midi keyboard to connect to the box. The idea of the project is to be headless (without monitor), so you just switch on the box, wait a few seconds to boot, and start playing without the need of a keyboard, mouse or monitor. 
 
 Ir you need more advanced functionality you can try the [HeadlessPi](https://github.com/albedozero/fluidpatcher) from the author of the [SquishBox](https://geekfunklabs.com/products/squishbox/)
 
@@ -24,7 +24,12 @@ The included sounfont contains a piano from [studioax.com](https://www.studioax.
 A note on USB Soundcards
 ------------------------
 
-There are many USB Soundcards out there. Cheap ones tend to sound bad. Some inexpensive and compatible chipsets include CM108, HS100B and PCM2704. The quality of the sound will also depend on the additional circuitry surrounding the main chipset, but PCM2704-based cards seem to tend to sound good, although it is difficult to find them with a case. I have used successfully a [LogiLink UA0078](https://images-na.ssl-images-amazon.com/images/I/51HhgVREaQS.__AC_SX300_SY300_QL70_ML2_.jpg) card (CM108 based) and a [generic HS100B card which included some (bad) headphones](https://images-na.ssl-images-amazon.com/images/I/61E5Mqz5caL.__AC_SX300_SY300_QL70_ML2_.jpg), The LogiLink needs a USB extension cable, since it does not fit directly in the USB connector of the QPlus. 
+There are many USB Soundcards out there. Cheap ones tend to sound bad. Some inexpensive and compatible chipsets include CM108, HS100B and PCM2704. The quality of the sound will also depend on the additional circuitry surrounding the main chipset, but PCM2704-based cards seem to tend to sound good, although it is difficult to find them with a case. I have used successfully a LogiLink UA0078 card (CM108 based):
+![LogiLink UA0078](https://images-na.ssl-images-amazon.com/images/I/51HhgVREaQS.__AC_SX300_SY300_QL70_ML2_.jpg)  
+and a generic HS100B card which included some (not very good) headphones
+![generic HS100B card](https://images-na.ssl-images-amazon.com/images/I/61E5Mqz5caL.__AC_SX300_SY300_QL70_ML2_.jpg)
+
+ The LogiLink needs a USB extension cable, since it does not fit directly in the USB connector of the QPlus. You can look for USB Headsets in Amazon and choose one that has a 3.5mm Jack just to be able to to use the DAC with a different headset. I would not be surprised that the cheap ones use a HS100B chipset, but there is not guarantee that they will actually work with Armbian if they use an exotic chipset.
 
 
 Installation
@@ -34,14 +39,17 @@ Installation is not difficult if you follow the steps carefully. You should conn
 
 ### Preparation of the SD Card
 
-This is done on a separate computer. These instructions are for a compatible TV Box (basically a QPlus, a T95 or a T95Max) (see https://forum.armbian.com/topic/16859-allwinner-h6/)
+This is done on a separate computer (in my case I have Windows). These instructions are for a compatible TV Box (basically a QPlus, a T95 or a T95Max) (see https://forum.armbian.com/topic/16859-allwinner-h6/) but might work with other boxes using the apropriate Armbian image.
 
 Download the latest armbian buster desktop release for the H6 chipset from https://users.armbian.com/balbes150/aw-h6-tv/ . At the time of writing it is 	
 `Armbian_21.08.0-trunk_Aw-h6-tv_buster_current_5.10.47_xfce_desktop.img.xz`
 
-The [official Armbian documentation](https://docs.armbian.com/User-Guide_Getting-Started/) recommends formatting first the card using the [SD Memory Card Formatter](https://www.sdcard.org/downloads/formatter/) and then using [USB Imager](https://gitlab.com/bztsrc/usbimager) to load the image into the SD Card, directly selecting the compressed .xz image. It has worked for me without problems. Be careful to select the drive with the SD Card in the dropdown list. Although the Windows drive cannot be selected, if you have additional disks they will appear in there.
+The [official Armbian documentation](https://docs.armbian.com/User-Guide_Getting-Started/) recommends the follwing steps and tools:
+1. Format first the card using the [SD Memory Card Formatter](https://www.sdcard.org/downloads/formatter/)
+2. Eject the card, insert it again.
+3. Use [USB Imager](https://gitlab.com/bztsrc/usbimager) to load the image into the SD Card, directly selecting the compressed .xz image. Be careful to select the drive with the SD Card in the dropdown list. Although the Windows drive cannot be selected, if you have additional disks they will appear in there.
 
-One of the good things of these H6-based TV Boxes is that they can boot from the SD Card directly. Once the image is burned in the SD Card, just insert the card in the TV Box, plug it and Armbian will start loading. The original Android system will stay in the internal storage and will boot normally if the SD Card is not inserted. There is an option to actually replace Android with Armbian, but it is not required, unless you want to forget about Android and just use Armbian. Armbian [comes with a tool](https://docs.armbian.com/User-Guide_Getting-Started/#how-to-install-to-emmc-nand-sata-usb) just to do that.
+One of the good things of these H6-based TV Boxes is that they can boot from the SD Card directly. Once the image is burned in the SD Card, just insert the card in the TV Box, plug it and Armbian will start loading. The original Android system will stay in the internal storage and you will be able to boot normally to Android if the SD Card is not inserted. There is an option to actually replace Android with Armbian, but it is not required, unless you want to forget about Android and just use Armbian. Armbian [comes with a tool](https://docs.armbian.com/User-Guide_Getting-Started/#how-to-install-to-emmc-nand-sata-usb) just to do that.
 
 
 ### Armbian initial configuration
@@ -54,7 +62,7 @@ Upon first boot, Armbian will typically ask several questions:
 4. Your 'real name'. Just leave the default, which is the user capitalized.
 5. If you want to set your user language based on your location. Since I prefer using English for the interface (it is easier to google problems and instructions if the messages are in English), I press 'n'
 
-If all goes well, it should show an x-windows interface. On the top left corner go to Applications-Settings-Armbian config. You will be asked for your password. Enter it. Once in the tool, select Personal. If needed, configure your keyboard layout for your language and then your timezone.
+If all goes well, it should show an x-windows interface. On the top left corner go to Applications-Settings-Armbian config. You will be asked for your password. Enter it. Once in the tool, select Personal. If needed, configure your keyboard layout for your language and then your timezone. I recommend using the Windows logo key for the Compose key. It can be useful when using the nano editor.
 
 Click on your user name on the top right corner and select Restart.
 
@@ -111,7 +119,7 @@ tar -xvzf v2.2.2.tar.gz
 cd fluidsynth-2.2.2
 mkdir build
 cd build
-sudo sed -i~orig -e 's/# deb-src/deb-src/' /etc/apt/sources.list
+sudo sed -i~orig -e 's/#deb-src/deb-src/' /etc/apt/sources.list
 sudo apt update
 sudo apt-get build-dep fluidsynth --no-install-recommends
 cmake ..
@@ -133,11 +141,23 @@ fluidsynth
 ```
 Although fluidsynth will complain about not finding a soundfont, you should get a `>` prompt. Press CTRL+C to exit fluidsynth.
 
-We will also install a component to reduce the latency of the sound. With jack, the latency can be much lower than any latency you can have in Android. The drawback is that only one application can take a hold of the audio device, which for us is fine (just remember not to have Firefox on when running the headless_synth):
+We will also install a component to reduce the latency of the sound. With jack, the latency can be much lower than any latency you can have in Android. The drawback is that only one application can take a hold of the audio device, which for us is fine (just remember not to have Firefox on when running the yafspiano):
 ```
 sudo apt install jackd2
 ```
 It wil ask you if you want to enable realtime. Select Yes.
+
+The default configuration assumes you USB Soundcard is called "Device". To confirm it, connect your USB Soundcard and type:
+
+```
+cat /proc/asound/cards
+```
+
+Note the name within []. If it is not "Device", edit the jackd configuration file with nano and replace "Device" with the corresponding name in your system, then press CTRL+X, confirm with 'y' and Enter to save:
+
+```
+nano ~/yafspiano/install_assets/.jackdrc 
+```
 
 Copy the default jack configuration to your home:
 
@@ -154,7 +174,7 @@ sudo reboot
 
 #### python3 prerequisites
 
-Since the headless_synth script is in python3, we need to install some requirements:
+Since the yafspiano script is in python3, we need to install some requirements:
 
 ```
 sudo apt install python3-pip
@@ -164,7 +184,7 @@ pip3 install wheel
 pip3 install pynput
 ```
 
-#### The headless_synth script
+#### The yafspiano script
 
 Close Firefox and test the script (you need at least a usb sound card connected, so either you use a USB hub or disconnect the mouse and connect the usb soundcard before running it):
 
@@ -174,7 +194,7 @@ python3 yafspiano/yafspiano.py
 
 After a few seconds you should hear a chord, indicating that the synth is ready. If you are not using a USB hub, you can now disconnect your computer keyboard and connect a midi keyboard. Fluidsynth should autodetect it and you should be able to play. You can press CTRL+C to abort (reconnect your computer keyboard if needed).
 
-#### Autostart the headless_synth upon boot
+#### Autostart yafspiano upon boot
 
 Since this is going to be headless, we want the script to autostart upon boot.
 
@@ -188,11 +208,11 @@ That's it. Make sure you close Firefox and reboot to see if it works:
 sudo reboot
 ```
 
-To powerdown the system, press volume up and down at the same time for a few seconds. You should hear a sound and then the screen should show the armbian logo and the wheel spinning for a few seconds until it stops. If the soundcard has a led, it should also turn off. You can unplug the tvbox now.
+When running the box without a monitor (headless), to powerdown the system, press volume up and down at the same time for a few seconds. You should hear a sound and if the soundcard has a led, it should turn off. This would signal that you can unplug the tvbox.
 
 #### Additional soundfonts
 
-You can download the GM Soundfont that typically is used with fluidsynth and create a symlink in the soundfonts directory:
+You can download the GM Soundfont that typically is used with fluidsynth and thwn create a symlink in the soundfonts directory:
 
 ```
 sudo apt install -y fluid-soundfont-gm

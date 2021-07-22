@@ -2,7 +2,7 @@
 Type=Application
 Name=yafspiano
 Comment=yafspiano
-Exec=bash -c '/usr/bin/python3 ~/yafspiano/yafspiano.py'
+Exec=bash -c '~/yafspiano/yafspiano.sh'
 StartupNotify=true
 Terminal=true
 Hidden=false

@@ -38,7 +38,7 @@ class Fluidsynth():
         logger.info(f"Starting fluidsynth  {shell_name}")
 
         self.fluid_proc = pexpect.spawnu(
-            f"/usr/bin/fluidsynth -C no -R no -g 1 -j " 
+            f"fluidsynth -C no -R no -g 1 -j " 
             f"-a jack -r 48000 -o midi.autoconnect={autoconnect} "
             f"-o synth.polyphony=64 '{sf}'")
         #self.fluid_proc.logfile = sys.stdout    
