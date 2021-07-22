@@ -76,13 +76,12 @@ class FeedbackSound(Fluidsynth):
 class MidiPlayer(Fluidsynth):
     def __init__(self):
         sf_path = os.path.join(os.path.dirname(__file__) ,"soundfonts")
-        self.sf_files = [os.path.join(sf_path, f) for f in os.listdir(sf_path) if os.path.isfile(os.path.join(sf_path, f))]
+        self.sf_files = [os.path.join(sf_path, f) 
+                        for f in os.listdir(sf_path) 
+                        if os.path.isfile(os.path.join(sf_path, f))]
         self.sf_files.sort()
         sf_file = self.sf_files[0]
         super().__init__(sf=sf_file, shell_name="main")
-        self.inst_list=[[]]
-        self.bank = 0
-        self.inst_num = 0
         self.sf_id = 1 # this always increases
         self.sf_index = 0
         self.rev_preset = 0 # 0 will mean off
@@ -91,18 +90,24 @@ class MidiPlayer(Fluidsynth):
 
     def load_instruments(self):
         self.cmd(f"inst {self.sf_id}")
+        
         instruments = self.fluid_proc.before
         logger.info(instruments)
         instruments = instruments.split("\r\n")[1:-1]
         logger.info("Instruments fetched")
 
-        bank=0
+        bank=-1
+        self.inst_list=[]
+        self.bank_list=[]
         for inst in instruments:
-            if int(inst[0:3])!=bank:
+            curr_bank = int(inst[0:3])
+            if not self.bank_list or curr_bank!=self.bank_list[-1]:
                 bank +=1
+                self.bank_list.append(curr_bank)
                 self.inst_list.append([])
             self.inst_list[bank].append(Instrument(int(inst[4:7]), inst[8:]))
-
+        self.bank = 0
+        self.inst_num = 0
         self.select_current()
         
 
@@ -126,8 +131,12 @@ class MidiPlayer(Fluidsynth):
         self.fluid_proc.wait()
     
     def select_current(self):
-        self.cmd(f"select 0 {self.sf_id} {self.bank} {self.inst_list[self.bank][self.inst_num].id}")
-        logger.info(self.inst_list[self.bank][self.inst_num].name)
+        self.cmd(f"select 0 {self.sf_id} " +
+                 f"{self.bank_list[self.bank]} " +
+                 f"{self.inst_list[self.bank][self.inst_num].id}")
+        logger.info(f"{self.bank_list[self.bank]}-" +
+                    f"{self.inst_list[self.bank][self.inst_num].id} " +
+                    f"{self.inst_list[self.bank][self.inst_num].name}")
 
     def next_inst(self, inc=1):
         self.inst_num = (self.inst_num + inc) % len(self.inst_list[self.bank])
@@ -164,7 +173,7 @@ class MidiPlayer(Fluidsynth):
             self.bank = len(self.inst_list)-1
         self.reset_inst()
         self.select_current()
-        
+        logger.info(f"Bank {self.bank_list[self.bank]}")
         self.play_chord()
 
     def exit(self):
@@ -238,12 +247,12 @@ class Yafspiano():
         if key == keyboard.Key.media_volume_down:
             self.key_status.media_volume_down = False
             self.key_status.media_volume_down_time = 0
-            inc = 1
+            inc = -1
 
         elif key == keyboard.Key.media_volume_up:
             self.key_status.media_volume_up = False
             self.key_status.media_volume_up_time = 0
-            inc = -1
+            inc = 1
 
         if inc:
             if self.current_mode is Mode.BANK:
