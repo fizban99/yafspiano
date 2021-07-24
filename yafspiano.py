@@ -43,7 +43,7 @@ class Fluidsynth():
             f"-o synth.polyphony=64 "
 	        f"-o audio.realtime-prio=90 "
 	        f"'{sf}'")
-        self.fluid_proc.logfile = sys.stdout    
+        #self.fluid_proc.logfile = sys.stdout    
         logger.info(f"Waiting for fluidsynth shell {shell_name}")
         p = self.fluid_proc.expect('help topics.')
         self.fluid_proc.expect('>')
