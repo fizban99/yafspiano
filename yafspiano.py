@@ -40,8 +40,10 @@ class Fluidsynth():
         self.fluid_proc = pexpect.spawnu(
             f"fluidsynth -C no -R no -g 1 -j " 
             f"-a jack -o midi.autoconnect={autoconnect} "
-            f"-o synth.polyphony=64 '{sf}'")
-        #self.fluid_proc.logfile = sys.stdout    
+            f"-o synth.polyphony=64 "
+	        f"-o audio.realtime-prio=90 "
+	        f"'{sf}'")
+        self.fluid_proc.logfile = sys.stdout    
         logger.info(f"Waiting for fluidsynth shell {shell_name}")
         p = self.fluid_proc.expect('help topics.')
         self.fluid_proc.expect('>')
@@ -62,7 +64,7 @@ class FeedbackSound(Fluidsynth):
 
     def click(self, n=1):
         self.cmd(f"select 0 1 0 0")
-        self.cmd(f"noteon 0 {59+n} 40")
+        self.cmd(f"noteon 0 {59+n} 127")
         # time.sleep(.1)
        
 

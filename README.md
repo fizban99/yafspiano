@@ -20,6 +20,7 @@ There are many places to download soundfonts. For piano soundfonts, try [Soundfo
 
 The included sounfont contains a piano from [studioax.com](https://www.studioax.com) and other instruments from the NiceKeys soundfont of [Soundfonts4U](https://sites.google.com/site/soundfonts4u/)
 
+If you have a piano like the Casio CDP-S100, which has a nice keybed but a mediocre piano sound, this little box can really improve the factory sound.
 
 A note on USB Soundcards
 ------------------------

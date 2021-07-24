@@ -1,1 +1,1 @@
-/usr/bin/jackd -d alsa -d hw:Device,0 -r 44000 -p 64 -n 3 -P -S
+/usr/bin/jackd -d alsa -d hw:Device,0 -r 44000 -p 64 -n 2 -P -S
