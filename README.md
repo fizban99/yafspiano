@@ -224,12 +224,8 @@ Usage
 
 Out of the 4 buttons only 3 are clickable: volume up, volume down and volume mute. The mic mute does not generate any signal.
 
-The volume mute changes the functionality of the volume up and down. By default, volume up and down navigate the instruments from the current bank. By pressing once  on the volume mute, the volume keys navigate through the banks. Once more and you can navigate through the soundfonts and a third one to toggle reverb. One more press and you can navigate through the instruments of the current bank again.
+The volume mute changes the functionality of the volume up and down. By default, volume up and down navigate the instruments from the current bank. By pressing once  on the volume mute, the volume keys navigate through the banks. Once more and you can navigate through the soundfonts and a third one to toggle reverb. One more press and you can navigate through the instruments of the current bank again. If you do a long press on volume up, you will go to the first element of the current mode (first instrument, bank or sounfont or reverb off).
 
 Additionaly, you can use the default functionality of FluidSynth if you have an Edit button in your Keyboard (e.g. KeyStation49 or KeyRig49):
 ![Piano settings](http://1.bp.blogspot.com/-HV-r5akM2UA/UfTxJK8mmbI/AAAAAAAABcM/x5FBg9kIBUA/s1600/Untitled-1.png)
 
-To do
-------------
-
-* Long click on volume up to reset current mode.

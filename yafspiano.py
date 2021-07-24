@@ -23,7 +23,7 @@ logger.setLevel(logging.INFO)
 class Mode(Enum):
     INSTRUMENT = 0
     BANK = 1
-    SOUNFONT = 2
+    SOUNDFONT = 2
     REVERB = 3
 
 
@@ -39,7 +39,7 @@ class Fluidsynth():
 
         self.fluid_proc = pexpect.spawnu(
             f"fluidsynth -C no -R no -g 1 -j " 
-            f"-a jack -r 48000 -o midi.autoconnect={autoconnect} "
+            f"-a jack -o midi.autoconnect={autoconnect} "
             f"-o synth.polyphony=64 '{sf}'")
         #self.fluid_proc.logfile = sys.stdout    
         logger.info(f"Waiting for fluidsynth shell {shell_name}")
@@ -55,16 +55,16 @@ class Fluidsynth():
 class FeedbackSound(Fluidsynth):
     def __init__(self):
         sf = os.path.join(
-             os.path.dirname(__file__) , "assets", "click.sf2")
+             os.path.dirname(__file__) , "assets", "voices.sf3")
         super().__init__(autoconnect=0, 
             shell_name="for feedback sounds",
             sf=sf)
 
     def click(self, n=1):
-        for _ in range(n):
-            self.cmd(f"select 0 1 0 0")
-            self.cmd(f"noteon 0 60 40")
-            time.sleep(.1)
+        self.cmd(f"select 0 1 0 0")
+        self.cmd(f"noteon 0 {59+n} 40")
+        # time.sleep(.1)
+       
 
     def shutdown(self):
         for n in range(5):
@@ -153,6 +153,15 @@ class MidiPlayer(Fluidsynth):
         self.load_instruments()
         self.play_chord()
 
+    def reset_soundfont(self, inc=1):
+        self.sf_index = 0
+        sf_file = self.sf_files[self.sf_index]
+        self.cmd(f"unload {self.sf_id}")
+        # the id seems to be always one more
+        self.sf_id += 1
+        self.cmd(f"load {sf_file}")
+        self.load_instruments()
+
     def next_reverb(self, inc=1):
         self.rev_preset = (self.rev_preset + inc) % 2
         if self.rev_preset !=0:
@@ -164,6 +173,10 @@ class MidiPlayer(Fluidsynth):
         else:
             self.cmd("reverb off")
         self.play_chord()
+
+    def reset_reverb(self):
+        self.rev_preset = 0
+        self.cmd("reverb off")
 
     def next_bank(self, inc=1):
         self.bank += inc
@@ -192,6 +205,8 @@ class Key_status():
         self.media_volume_down_time=0
         self.media_volume_up_time=0
         self.shuttingdown = False
+        self.reset = False
+        self.busy =False
 
 
 class Yafspiano():
@@ -204,6 +219,7 @@ class Yafspiano():
 
     def shutdown(self):
         self.key_status.shuttingdown=True
+        self.key_status.reset = False
         logger.info("shutting down!")
         self.fs.shutdown()
         self.mp.exit()
@@ -211,14 +227,16 @@ class Yafspiano():
 
 
     def on_press(self, key):
-        if self.key_status.shuttingdown:
+        if self.key_status.shuttingdown or self.key_status.reset:
             return
 
         if key == keyboard.Key.media_volume_down:
             if not self.key_status.media_volume_down:
+                # first time pressing the key (it is a repeating event)
                 self.key_status.media_volume_down=True
                 self.key_status.media_volume_down_time=time.time()
             elif (self.key_status.media_volume_up and 
+                # at the same time both buttons for more than 2 seconds
                 time.time()- self.key_status.media_volume_up_time > 2 and
                 time.time()- self.key_status.media_volume_down_time > 2):
                 self.shutdown()
@@ -227,10 +245,28 @@ class Yafspiano():
             if not self.key_status.media_volume_up:
                 self.key_status.media_volume_up = True
                 self.key_status.media_volume_up_time = time.time()
-            elif (self.key_status.media_volume_up and 
+            elif (self.key_status.media_volume_down and 
                 time.time()- self.key_status.media_volume_up_time > 2 and
                 time.time()- self.key_status.media_volume_down_time > 2):
                 self.shutdown()
+            elif (time.time()- self.key_status.media_volume_up_time > 2):
+                # volume up for more than 2 seconds
+                self.key_status.reset = True
+                if self.current_mode is Mode.BANK:
+                    self.mp.reset_bank()
+                    self.mp.reset_inst()
+                elif self.current_mode is Mode.INSTRUMENT:
+                    self.mp.reset_inst()
+                elif self.current_mode is Mode.SOUNDFONT:
+                    self.mp.reset_soundfont()
+                    self.mp.reset_bank()
+                    self.mp.reset_inst()
+                elif self.current_mode is Mode.REVERB:
+                    self.mp.reset_reverb()                
+                self.mp.select_current()
+                self.mp.play_chord()
+                
+
 
         # volume mute sends press release together. No support for long clicks
         elif key == keyboard.Key.media_volume_mute:
@@ -240,7 +276,12 @@ class Yafspiano():
                 
 
     def on_release(self, key):
-        if self.key_status.shuttingdown:
+        if self.key_status.shuttingdown or self.key_status.busy:
+            return
+        elif self.key_status.reset:
+            self.key_status.reset = False
+            self.key_status.media_volume_down = False
+            self.key_status.media_volume_up = False
             return
         
         inc = 0
@@ -255,15 +296,16 @@ class Yafspiano():
             inc = 1
 
         if inc:
+            self.key_status.busy = True
             if self.current_mode is Mode.BANK:
                 self.mp.next_bank(inc)
             elif self.current_mode is Mode.INSTRUMENT:
                 self.mp.next_inst(inc)
-            elif self.current_mode is Mode.SOUNFONT:
+            elif self.current_mode is Mode.SOUNDFONT:
                 self.mp.next_soundfont(inc)
             elif self.current_mode is Mode.REVERB:
                 self.mp.next_reverb(inc)
-            
+            self.key_status.busy = False
 
     def run(self):
         listener = keyboard.Listener(
